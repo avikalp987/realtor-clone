@@ -82,7 +82,7 @@ export default function Profile() {
             />
 
             <div className='flex justify-between whitespace-nowrap text-sm sm:text-lg mb-6'>
-              <p>Do You Wnat To Change Your Name?
+              <p>Do You Want To Change Your Name?
                 <span 
                 onClick={() => {
                   changeDetail && onSubmit()

@@ -54,8 +54,8 @@ export default function CreateListing() {
                 setListing(docSnap.data());
                 setFormData({
                     ...docSnap.data(),
-                    latitude:listing.geoLocation.lat,
-                    longitude:listing.geoLocation.lng,
+                    latitude:listing?.geoLocation?.lat,
+                    longitude:listing?.geoLocation?.lng,
                     
                 })
                 setLoading(false);
@@ -66,7 +66,7 @@ export default function CreateListing() {
         }
 
         fetchListing();
-    } ,[navigate,params.listingId,listing.geoLocation.lat,listing.geoLocation.lng])
+    } ,[navigate,params.listingId,listing?.geoLocation?.lat,listing?.geoLocation?.lng])
 
 
     
@@ -154,13 +154,6 @@ export default function CreateListing() {
             return;
         }
 
-        if(images.length>6)
-        {
-            setLoading(false);
-            toast.error("Maximum 6 images allowed");
-            return;
-        }
-
         let geoLocation = {}
         let location
         if(geoLocationEnabled) 
@@ -186,13 +179,28 @@ export default function CreateListing() {
            geoLocation.lng = longitude;
         }
 
-        const imgUrls = await Promise.all(
-            [...images].map((image) => storeImage(image)))
-            .catch((error) => {
-                setLoading(false);
-                toast.error("Oops! Images not uploaded");
-                return;
+        const imgUrls = listing.imgUrls;
+        if(images)
+        {
+            const tempUrls = await Promise.all(
+                [...images].map((image) => storeImage(image)))
+                .catch((error) => {
+                    setLoading(false);
+                    toast.error("Oops! Images not uploaded");
+                    return;
+                })
+
+            tempUrls.forEach((url) => {
+                imgUrls.push(url);
             })
+        }
+
+        if(imgUrls.length>6)
+        {
+            setLoading(false);
+            toast.error("Maximum 6 images allowed");
+            return;
+        }
 
         const formDataCopy = {
             ...formData,
@@ -477,7 +485,6 @@ export default function CreateListing() {
                 onChange={onChange}
                 accept='.jpg,.png,.jpeg'
                 multiple
-                required
                 />
             </div>
 

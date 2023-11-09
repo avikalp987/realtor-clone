@@ -1,5 +1,5 @@
 import { getAuth, updateProfile } from 'firebase/auth';
-import { collection, doc, getDocs, orderBy, query, updateDoc, where } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDocs, orderBy, query, updateDoc, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router';
 import { db } from '../firebase';
@@ -28,14 +28,14 @@ export default function Profile() {
       const q = query(listingRef,where("userRef","==",auth.currentUser.uid),orderBy("timestamp","desc"));
 
       const querySnap = await getDocs(q);
-      let listing = [];
+      let listings = [];
       querySnap.forEach((doc) => {
-        return listing.push({
+        return listings.push({
           id: doc.id,
           data: doc.data(),
         });
       });
-      setListings(listing);
+      setListings(listings);
       setLoading(false);
     }
     
@@ -77,6 +77,21 @@ export default function Profile() {
     } catch (error) {
       toast.error("Oops! Something went wrong")
     }
+  }
+
+  const onEdit = (listingId) => {
+    navigate(`/edit-listing/${listingId}`);
+  }
+
+  const onDelete = async (listingId) => {
+    if(window.confirm("The listing cannot be restored once deleted")){
+      await deleteDoc(doc(db, "listings", listingId));
+      const updatedListings = listings.filter((listing) => listing.id!==listingId);
+      setListings(updatedListings);
+
+      toast.success("Listing deleted!");
+    }
+    
   }
 
 
@@ -152,7 +167,13 @@ export default function Profile() {
             className='sm:grid sm:grid-col-2 lg:grid-col-3 xl:grid-cols-4 2xl:grid-cols-5 mt-6 mb-6'
             >
               {listings.map((listing) => (
-                <ListingItem key={listing.id} id={listing.id} listing={listing.data}/>
+                <ListingItem 
+                key={listing.id} 
+                id={listing.id} 
+                listing={listing.data}
+                onDelete={() => onDelete(listing.id)}
+                onEdit={() => onEdit(listing.id)}
+                />
               ))}
             </ul>
           </>

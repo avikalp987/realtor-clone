@@ -1,4 +1,4 @@
-import { list, listAll } from 'firebase/storage'
+
 import React from 'react'
 import Moment from 'react-moment'
 import { Link } from 'react-router-dom'
@@ -35,7 +35,7 @@ export default function ListingItem({listing,id,onEdit,onDelete}) {
                 <p className='text-[#457B9D] mt-2 font-semibold'>₹{listing.offer ? 
                     listing.discountedPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g,",")
                     : 
-                    listing.regularPricetoString().replace(/\B(?=(\d{3})+(?!\d))/g,",")}
+                    listing.regularPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g,",")}
                     {listing.type==="rent" && " / Month"}
                 </p>
 

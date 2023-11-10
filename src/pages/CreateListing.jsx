@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router';
   
 export default function CreateListing() {
 
-    const [geoLocationEnabled,setGeoLocationEnabled] = useState(false);
+    
     const [loading,setLoading] = useState(false);
     const auth = getAuth();
     const navigate = useNavigate();
@@ -89,6 +89,9 @@ export default function CreateListing() {
                     case "running":
                       console.log("Upload is running");
                       break;
+                    case "default":
+                        console.log("");
+                        break;
                   }
                 },
                 (error) => {
@@ -124,29 +127,8 @@ export default function CreateListing() {
         }
 
         let geoLocation = {}
-        let location
-        if(geoLocationEnabled) 
-        {
-          const response = await fetch (`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${process.env.REACT_APP_GEOCODE_API_KEY}`);
-           const data = await response.json();
-          
-          geoLocation.lat = data.results[0]?.geometry.location.lat ?? 0;
-          geoLocation.lng = data.results[0]?.geometry.location.lng ?? 0;
-
-          location = data.status === "ZERO RESULTS" && undefined    
-
-        if(location === undefined)
-        {
-          setLoading(false);
-          toast.error("Oops! Address not identified");
-
-          return;
-        }
-        }else
-        {
-           geoLocation.lat = latitude;
-           geoLocation.lng = longitude;
-        }
+        geoLocation.lat = latitude;
+        geoLocation.lng = longitude;
 
         const imgUrls = await Promise.all(
             [...images].map((image) => storeImage(image)))
@@ -321,8 +303,7 @@ export default function CreateListing() {
             className='w-full px-4 py-2 text-xl text-gray-700 bg-white border border-gray-300 rounded transition duration-150 ease-in-out focus:text-gray-700 focus:bg-white focus:border-slate-600 mb-6'/>
 
 
-            {!geoLocationEnabled && (
-                <div className="flex space-x-6 mb-6">
+<div className="flex space-x-6 mb-6">
                     <div className="">
                         <p className='text-lg font-semibold'>Latitude</p>
                         <input type="number" id="latitude" value={latitude} step="0.000001"
@@ -347,7 +328,6 @@ export default function CreateListing() {
                         />
                     </div>
                 </div>
-            )}
             <p className='text-lg font-semibold'>Description</p>
             <textarea 
             onChange={onChange}
